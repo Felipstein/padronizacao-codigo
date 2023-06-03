@@ -28,7 +28,71 @@ npm pkg set scripts.prepare="husky install"
 npm run prepare
 ```
 
-## 2. Configurar o commitlint
+## 2. Configurar o commitlint dentro do husky
+
+Agora, precisamos que o husky intercepte algum commit e execute o cli do commitlint.
+
+Execute esse script para adicionar um hook:
+```bash
+npx husky add .husky/commit-msg  'npx --no -- commitlint --edit ${1}'
+```
+
+
+## 3. Configurar o commitizen
+
+o commitizen trás uma experiência diferente quando fazemos um commit. Ao invés de escrevermos `git commit -m "e tentar acertar o commit convencional por aqui"`. Nós podemos escrever: `git commit`, e ele começa uma sequência de perguntas para criar nosso commit padronizado.
+
+### Passo #1
+
+Instalar o commitizen
+```bash
+npm install -D commitizen
+```
+
+### Passo #2
+
+Iniciar configuração automatica do commitizen
+```bash
+# npm
+npx commitizen init cz-conventional-changelog --save-dev --save-exact
+
+# yarn
+npx commitizen init cz-conventional-changelog --yarn --dev --exact
+
+# pnpm
+npx commitizen init cz-conventional-changelog --pnpm --save-dev --save-exact
+```
+
+## 4. "Lintar"/Indentar nosso código quando fazermos um commit
+
+Podemos usar o ESLint para lintar nosso código, deixa-lo padronizadinho e corrigido, quando algum commit ocorrer.
+Para isso, vamos usar o okonet/lint-staged.
+
+### Passo #1
+
+Instalar o lint-staged
+```bash
+npm install -D lint-staged
+```
+
+### Passo #2
+
+Configurar no package.json, adicione essa seção:
+```json
+"lint-staged": {
+  "*.ts": ["npx eslint src/* --fix"]
+},
+```
+(*.ts é todos os arquivos que ele executará esse comando)
+
+### Passo #3
+
+Configurar com o husky
+```bash
+npx husky add .husky/pre-commit "npx link-staged"
+```
+
+## [NÃO TERMINADO] (BÔNUS) Configurar o commitlint
 
 Commitlint é uma biblioteca que padroniza mensagens de um commit para o formato convencional deveras utilizado (e, se não me engano, foram eles mesmo que desenvolveram) pelo Angular.
 
@@ -55,61 +119,7 @@ Ou você pode executar um script que crie esse arquivo automaticamente:
 echo "module.exports = {extends: ['@commitlint/config-conventional']}" > commitlint.config.js
 ```
 
-## 3. Configurar o commitlint dentro do husky
-
-Agora, precisamos que o husky intercepte algum commit e execute o cli do commitlint.
-
-Execute esse script para adicionar um hook:
-```bash
-npx husky add .husky/commit-msg  'npx --no -- commitlint --edit ${1}'
-```
-
-
-## 4. Configurar o commitizen
-
-o commitizen trás uma experiência diferente quando fazemos um commit. Ao invés de escrevermos `git commit -m "e tentar acertar o commit convencional por aqui"`. Nós podemos escrever: `git commit`, e ele começa uma sequência de perguntas para criar nosso commit padronizado.
-
-### Passo #1
-
-Instalar o commitizen
-```bash
-npm install -D commitizen
-```
-
-### Passo #2
-
-Iniciar configuração automatica do commitizen
-```bash
-# npm
-npx commitizen init cz-conventional-changelog --save-dev --save-exact
-
-# yarn
-npx commitizen init cz-conventional-changelog --yarn --dev --exact
-
-# pnpm
-npx commitizen init cz-conventional-changelog --pnpm --save-dev --save-exact
-```
-
-## 5. "Lintar"/Indentar nosso código quando fazermos um commit
-
-Podemos usar o ESLint para lintar nosso código, deixa-lo padronizadinho e corrigido, quando algum commit ocorrer.
-Para isso, vamos usar o okonet/lint-staged.
-
-### Passo #1
-
-Instalar o lint-staged
-```bash
-npm install -D lint-staged
-```
-
-### Passo #2
-
-Configurar com o husky
-```bash
-npx husky add .husky/pre-commit "eslint ./ --fix"
-```
-
-## [NÃO TERMINADO] (BÔNUS) Utilizar o commitizen quando fazermos algum commit.
+### Passo #3
 
 Precisamos agora utilizar o commitizen (npx git-cz) no lugar do "git commit", para que criamos o commit com uma outra experiência. Vamos usar o husky para isso.
 
